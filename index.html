@@ -313,9 +313,36 @@
   .fb-home input{width:100%;box-sizing:border-box;padding:13px 20px;font-size:15px;border:1px solid #dfe1e5;border-radius:24px;outline:none;box-shadow:0 1px 6px rgba(32,33,36,.12);}
   .fb-home input:focus{box-shadow:0 1px 8px rgba(32,33,36,.25);}
   .fb-quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px;width:min(560px,100%);margin-top:28px;}
-  .fb-quick button{border:none;background:#fff;border-radius:12px;padding:14px 6px;cursor:pointer;font-size:12px;color:#3c4043;box-shadow:0 1px 3px rgba(0,0,0,.08);}
-  .fb-quick button:hover{background:#f1f3f4;}
-  .fb-quick b{display:block;font-size:24px;margin-bottom:6px;font-weight:400;}
+  .fb-q{position:relative;}
+  .fb-qgo{width:100%;height:100%;border:none;background:#fff;border-radius:12px;padding:14px 6px;cursor:pointer;font-size:12px;color:#3c4043;box-shadow:0 1px 3px rgba(0,0,0,.08);}
+  .fb-qgo:hover{background:#f1f3f4;}
+  .fb-qn{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+  .fb-qgo b{display:flex;align-items:center;justify-content:center;height:30px;font-size:24px;margin-bottom:6px;font-weight:400;}
+  .fb-ico span{width:30px;height:30px;border-radius:50%;background:#e8eaed;color:#3c4043;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;}
+  .fb-ico img{width:26px;height:26px;}
+  .fb-qadd{background:transparent;box-shadow:inset 0 0 0 1.5px #dadce0;color:#5f6368;}
+  .fb-qadd b{color:#1a73e8;font-size:26px;}
+  .fb-qx,.fb-qe{position:absolute;top:4px;width:22px;height:22px;border:none;border-radius:50%;background:#f1f3f4;color:#5f6368;font-size:11px;line-height:22px;padding:0;cursor:pointer;opacity:0;transition:opacity .12s;}
+  .fb-qx{right:4px;} .fb-qe{left:4px;}
+  .fb-qx:hover{background:#d93025;color:#fff;} .fb-qe:hover{background:#1a73e8;color:#fff;}
+  .fb-q:hover .fb-qx,.fb-q:hover .fb-qe,.fb-qx:focus,.fb-qe:focus{opacity:1;}
+  @media (hover:none){ .fb-qx,.fb-qe{opacity:.85;} }
+  .fb-restore{margin-top:14px;border:none;background:none;color:#1a73e8;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;}
+  .fb-restore:hover{background:#e8f0fe;}
+  .fb-sheet{position:absolute;inset:0;background:rgba(32,33,36,.35);display:flex;align-items:flex-start;justify-content:center;padding:70px 16px 16px;z-index:5;}
+  .fb-sheet-card{width:min(380px,100%);background:#fff;border-radius:14px;padding:20px;box-shadow:0 12px 40px rgba(0,0,0,.25);display:flex;flex-direction:column;gap:12px;}
+  .fb-sheet-h{font-size:16px;font-weight:600;}
+  .fb-sheet-card label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:#5f6368;}
+  .fb-sheet-card label span{color:#9aa0a6;}
+  .fb-sheet-card input{border:1px solid #dadce0;border-radius:8px;padding:9px 11px;font-size:13.5px;outline:none;color:#202124;}
+  .fb-sheet-card input:focus{border-color:#1a73e8;box-shadow:0 0 0 1px #1a73e8;}
+  .fb-sheet-err{color:#d93025;font-size:12px;min-height:0;}
+  .fb-sheet-err:empty{display:none;}
+  .fb-sheet-row{display:flex;gap:8px;align-items:center;}
+  .fb-sheet-row button{border:none;border-radius:18px;padding:8px 16px;font-size:13px;cursor:pointer;}
+  .fb-sheet-row .ok{background:#1a73e8;color:#fff;font-weight:600;}
+  .fb-sheet-row .cancel{background:#f1f3f4;color:#3c4043;}
+  .fb-sheet-row .del{background:none;color:#d93025;padding-left:4px;}
   .fb-note{font-size:11.5px;color:#80868b;margin-top:26px;max-width:520px;text-align:center;line-height:1.5;}
   .fb-hint{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);display:flex;align-items:center;gap:10px;max-width:calc(100% - 28px);
     background:#202124;color:#fff;font-size:12px;padding:8px 8px 8px 14px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.3);z-index:2;}
@@ -5701,7 +5728,7 @@
       'netflix.com','linkedin.com','tiktok.com','mail.google.com','accounts.google.com','drive.google.com','docs.google.com',
       'chatgpt.com','claude.ai','discord.com','twitch.tv','spotify.com','apple.com','paypal.com','ebay.com','pinterest.com',
       'stackoverflow.com','yahoo.com','bing.com','duckduckgo.com','nytimes.com','cnn.com','bbc.com','roblox.com','microsoft.com','outlook.com'];
-    const QUICK = [
+    const DEFAULT_QUICK = [
       {i:'🔎', n:'Google', u:'https://www.google.com/search?igu=1&q='},
       {i:'📚', n:'Wikipedia', u:'https://en.wikipedia.org/wiki/Main_Page'},
       {i:'🗺️', n:'Map', u:'https://www.openstreetmap.org/export/embed.html?bbox=-122.52%2C37.70%2C-122.35%2C37.83&layer=mapnik'},
@@ -5711,6 +5738,22 @@
       {i:'♟️', n:'Lichess', u:'https://lichess.org/'},
       {i:'📰', n:'Hacker News', u:'https://news.ycombinator.com/'},
     ];
+    // Shortcuts are saved per FauxOS account ('fauxos-…' keys are separated per account automatically).
+    const QKEY = 'fauxos-browser-shortcuts', MAXQ = 24;
+    let QUICK = (()=>{ try{ const v = JSON.parse(localStorage.getItem(QKEY)); if(Array.isArray(v)) return v.filter(q=>q && typeof q.u==='string' && /^https?:/i.test(q.u)).slice(0,MAXQ); }catch(e){} return DEFAULT_QUICK.map(q=>({...q})); })();
+    const homes = new Set();   // start pages currently on screen, so edits show in every tab
+    function saveQuick(){
+      try{ localStorage.setItem(QKEY, JSON.stringify(QUICK)); }catch(e){ toast("Couldn't save shortcuts — storage is full or blocked"); }
+      homes.forEach(h=>{ if(h.isConnected) h._drawQuick(); else homes.delete(h); });
+      refreshStar();
+    }
+    const isDefaultQuick = ()=> JSON.stringify(QUICK.map(q=>[q.i||'',q.n,q.u])) === JSON.stringify(DEFAULT_QUICK.map(q=>[q.i,q.n,q.u]));
+    const sameUrl = (a,b)=> display(a).replace(/\/$/,'') === display(b).replace(/\/$/,'');
+    function tileIcon(q){
+      if(q.i) return `<b>${esc(q.i)}</b>`;
+      const h = hostOf(q.u), letter = esc(((q.n||h||'?').trim()[0]||'?').toUpperCase());
+      return `<b class="fb-ico"><span>${letter}</span>${h ? `<img alt="" src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(h)}&sz=64" onload="this.previousElementSibling.style.display='none'" onerror="this.remove()">` : ''}</b>`;
+    }
     container.innerHTML = `<div class="fb">
       <div class="fb-tabs"><button class="fb-newtab" title="New tab">+</button></div>
       <div class="fb-bar">
@@ -5719,6 +5762,7 @@
         <button class="fb-btn" data-a="reload" title="Reload">↻</button>
         <button class="fb-btn" data-a="home" title="Home">⌂</button>
         <input class="fb-url" type="text" spellcheck="false" autocomplete="off" placeholder="Search Google or type a web address">
+        <button class="fb-btn" data-a="star" title="Add this page to shortcuts">☆</button>
         <button class="fb-btn" data-a="ext" title="Open this page in a real browser tab">↗</button>
       </div>
       <div class="fb-body"><div class="fb-load"></div></div>
@@ -5768,14 +5812,82 @@
       const d = document.createElement('div'); d.className = 'fb-home';
       d.innerHTML = `<h1>🌐 FauxOS Browser</h1>
         <form><input type="text" placeholder="Search Google or type a web address" spellcheck="false" autocomplete="off"></form>
-        <div class="fb-quick">${QUICK.map((q,i)=>`<button type="button" data-q="${i}"><b>${q.i}</b>${esc(q.n)}</button>`).join('')}</div>
+        <div class="fb-quick"></div>
+        <button type="button" class="fb-restore" hidden>Restore default shortcuts</button>
         <div class="fb-note">Pages load for real. Some sites (like YouTube's homepage, Facebook or Amazon) don't allow being shown inside another page — for those, use ↗ to open them in a real browser tab. YouTube video links play here automatically.</div>`;
       const inp = d.querySelector('input');
       d.querySelector('form').addEventListener('submit', e=>{ e.preventDefault(); go(t, inp.value); });
       inp.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); go(t, inp.value); } });
-      d.querySelectorAll('[data-q]').forEach(b => b.addEventListener('click', ()=> go(t, QUICK[+b.dataset.q].u)));
+      const grid = d.querySelector('.fb-quick'), restore = d.querySelector('.fb-restore');
+      d._drawQuick = ()=>{
+        grid.innerHTML = QUICK.map((q,i)=>`<div class="fb-q" data-q="${i}"><button type="button" class="fb-qgo" title="${esc(display(q.u))}">${tileIcon(q)}<span class="fb-qn">${esc(q.n)}</span></button>`+
+          `<button type="button" class="fb-qe" data-e="${i}" title="Edit shortcut" aria-label="Edit ${esc(q.n)}">✎</button><button type="button" class="fb-qx" data-x="${i}" title="Remove shortcut" aria-label="Remove ${esc(q.n)}">✕</button></div>`).join('')
+          + (QUICK.length < MAXQ ? `<div class="fb-q"><button type="button" class="fb-qgo fb-qadd"><b>+</b><span class="fb-qn">Add shortcut</span></button></div>` : '');
+        restore.hidden = isDefaultQuick();
+      };
+      grid.addEventListener('click', e=>{
+        const x = e.target.closest('[data-x]'), ed = e.target.closest('[data-e]'), add = e.target.closest('.fb-qadd'), tile = e.target.closest('[data-q]');
+        if(x){ const i = +x.dataset.x, gone = QUICK.splice(i,1)[0]; saveQuick(); undoToast(gone, i); }
+        else if(ed){ editShortcut(d, +ed.dataset.e); }
+        else if(add){ editShortcut(d, -1); }
+        else if(tile){ go(t, QUICK[+tile.dataset.q].u); }
+      });
+      restore.addEventListener('click', ()=>{ QUICK = DEFAULT_QUICK.map(q=>({...q})); saveQuick(); toast('Default shortcuts restored'); });
+      d._drawQuick(); homes.add(d);
       setTimeout(()=>{ if(t===cur) inp.focus(); }, 30);
       return d;
+    }
+    function undoToast(gone, i){
+      const old = body.querySelector('.fb-undo'); if(old) old.remove();
+      const h = document.createElement('div'); h.className = 'fb-hint fb-undo';
+      h.innerHTML = `<span></span><button class="go">Undo</button><button class="no">✕</button>`;
+      h.querySelector('span').textContent = `Removed "${gone.n}"`;
+      h.querySelector('.go').addEventListener('click', ()=>{ QUICK.splice(Math.min(i,QUICK.length),0,gone); saveQuick(); h.remove(); });
+      h.querySelector('.no').addEventListener('click', ()=> h.remove());
+      body.appendChild(h); setTimeout(()=>{ if(h.isConnected) h.remove(); }, 6000);
+    }
+    // Add (idx -1) or edit a shortcut in a small sheet over the start page (or over the current page from ☆).
+    function editShortcut(host, idx, preset){
+      const old = body.querySelector('.fb-sheet'); if(old) old.remove();
+      const q = idx>=0 ? QUICK[idx] : (preset || {n:'', u:''});
+      const w = document.createElement('div'); w.className = 'fb-sheet';
+      w.innerHTML = `<form class="fb-sheet-card">
+          <div class="fb-sheet-h">${idx>=0 ? 'Edit shortcut' : 'Add shortcut'}</div>
+          <label>Name<input name="n" type="text" maxlength="40" autocomplete="off" spellcheck="false"></label>
+          <label>Web address<input name="u" type="text" autocomplete="off" spellcheck="false" placeholder="example.com"></label>
+          <label><div>Icon <span>(optional — one emoji)</span></div><input name="i" type="text" maxlength="8" autocomplete="off" placeholder="Uses the site's icon"></label>
+          <div class="fb-sheet-err"></div>
+          <div class="fb-sheet-row">${idx>=0 ? '<button type="button" class="del">Remove</button>' : ''}<span style="flex:1"></span>
+            <button type="button" class="cancel">Cancel</button><button type="submit" class="ok">${idx>=0 ? 'Save' : 'Add'}</button></div>
+        </form>`;
+      const f = w.querySelector('form'), err = w.querySelector('.fb-sheet-err');
+      f.n.value = q.n || ''; f.u.value = q.u ? display(q.u) : ''; f.i.value = q.i || '';
+      const close = ()=> w.remove();
+      const submit = ()=>{
+        const raw = f.u.value.trim();
+        if(!raw){ err.textContent = 'Enter a web address.'; f.u.focus(); return; }
+        const u = resolve(raw);
+        if(u===HOME || !/^https?:/i.test(u) || (/google\.com\/search/.test(u) && !/^(https?:\/\/)?(www\.)?google\.com/i.test(raw))){ err.textContent = "That doesn't look like a web address."; f.u.focus(); return; }
+        const n = f.n.value.trim() || titleFor(u), i = [...f.i.value.trim()].slice(0,2).join('');
+        const item = {n, u}; if(i) item.i = i;
+        if(idx>=0) QUICK[idx] = item;
+        else{ if(QUICK.length>=MAXQ){ err.textContent = `You can have up to ${MAXQ} shortcuts.`; return; } QUICK.push(item); }
+        saveQuick(); close(); body.querySelectorAll('.fb-undo').forEach(e=>e.remove()); toast(idx>=0 ? 'Shortcut saved' : `Added "${n}" to shortcuts`);
+      };
+      f.addEventListener('submit', e=>{ e.preventDefault(); submit(); });
+      f.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); submit(); } else if(e.key==='Escape'){ e.preventDefault(); close(); } });
+      w.querySelector('.ok').addEventListener('click', e=>{ e.preventDefault(); submit(); });
+      w.querySelector('.cancel').addEventListener('click', close);
+      const del = w.querySelector('.del'); if(del) del.addEventListener('click', ()=>{ const gone = QUICK.splice(idx,1)[0]; saveQuick(); close(); undoToast(gone, idx); });
+      w.addEventListener('mousedown', e=>{ if(e.target===w) close(); });
+      body.appendChild(w);
+      setTimeout(()=> (idx<0 && !preset ? f.u : f.n).focus(), 20);
+    }
+    function refreshStar(){
+      if(!cur) return;
+      const b = btn('star'), u = cur.hist[cur.idx], on = u!==HOME && QUICK.some(q=>sameUrl(q.u,u));
+      b.disabled = u===HOME; b.textContent = on ? '★' : '☆'; b.style.color = on ? '#1a73e8' : '';
+      b.title = on ? 'Remove this page from shortcuts' : 'Add this page to shortcuts';
     }
     function blockedPage(u){
       const d = document.createElement('div'); d.className = 'fb-home';
@@ -5844,8 +5956,10 @@
       btn('back').disabled = cur.idx<=0;
       btn('fwd').disabled = cur.idx>=cur.hist.length-1;
       btn('ext').disabled = cur.hist[cur.idx]===HOME;
+      refreshStar();
     }
     function select(t){
+      if(t!==cur) body.querySelectorAll('.fb-sheet,.fb-undo').forEach(e=>e.remove());
       cur = t;
       tabs.forEach(x=>{ if(x.view) x.view.style.display = x===t ? '' : 'none'; if(x.hint) x.hint.style.display = x===t ? '' : 'none'; });
       bar.style.width = '0';
@@ -5873,6 +5987,12 @@
     btn('reload').addEventListener('click', ()=>{ render(cur); refresh(); });
     btn('home').addEventListener('click', ()=> go(cur, HOME));
     btn('ext').addEventListener('click', ()=> openExternal(cur.hist[cur.idx]));
+    btn('star').addEventListener('click', ()=>{
+      const u = cur.hist[cur.idx]; if(u===HOME) return;
+      const i = QUICK.findIndex(q=>sameUrl(q.u,u));
+      if(i>=0){ const gone = QUICK.splice(i,1)[0]; saveQuick(); undoToast(gone, i); }
+      else editShortcut(null, -1, {n: titleFor(u), u});
+    });
     urlIn.addEventListener('focus', ()=> urlIn.select());
     urlIn.addEventListener('keydown', e=>{
       if(e.key==='Enter'){ e.preventDefault(); go(cur, urlIn.value); urlIn.blur(); }
