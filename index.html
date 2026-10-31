@@ -286,6 +286,43 @@
   .browserbar{display:flex;gap:6px;padding:8px;background:#eee;border-bottom:1px solid #ddd;}
   .browserbar input{flex:1;border:1px solid #ccc;border-radius:16px;padding:6px 12px;font-size:12.5px;}
   .browserpage{padding:20px;font-size:13.5px;}
+  .fb{display:flex;flex-direction:column;height:100%;background:#fff;color:#1d1d1f;}
+  .fb-tabs{display:flex;align-items:flex-end;gap:2px;padding:6px 6px 0;background:#dfe1e5;overflow-x:auto;scrollbar-width:none;flex:0 0 auto;}
+  .fb-tab{display:flex;align-items:center;gap:6px;min-width:90px;max-width:200px;flex:0 1 200px;padding:7px 8px 7px 12px;border-radius:9px 9px 0 0;
+    background:transparent;font-size:12px;cursor:pointer;color:#3c4043;user-select:none;}
+  .fb-tab:hover{background:#eceef1;}
+  .fb-tab.active{background:#fff;}
+  .fb-tab .t{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+  .fb-tab .x{width:18px;height:18px;border:none;background:none;border-radius:50%;cursor:pointer;font-size:13px;line-height:18px;padding:0;color:#5f6368;flex:0 0 auto;}
+  .fb-tab .x:hover{background:#d3d6da;}
+  .fb-newtab{border:none;background:none;font-size:18px;width:28px;height:28px;border-radius:50%;cursor:pointer;color:#3c4043;margin:0 0 3px 2px;flex:0 0 auto;}
+  .fb-newtab:hover{background:#cfd2d6;}
+  .fb-bar{display:flex;align-items:center;gap:4px;padding:6px 8px;border-bottom:1px solid #e3e3e3;flex:0 0 auto;}
+  .fb-btn{border:none;background:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:15px;color:#3c4043;flex:0 0 auto;}
+  .fb-btn:hover:not(:disabled){background:#eef0f2;}
+  .fb-btn:disabled{opacity:.35;cursor:default;}
+  .fb-url{flex:1;min-width:0;border:1px solid transparent;background:#f1f3f4;border-radius:16px;padding:7px 14px;font-size:13px;outline:none;color:#202124;}
+  .fb-url:focus{background:#fff;border-color:#1a73e8;box-shadow:0 0 0 1px #1a73e8;}
+  .fb-body{position:relative;flex:1;min-height:0;}
+  body.fx-tracking .fb-body iframe{pointer-events:none;}
+  .fb-body iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff;}
+  .fb-home{position:absolute;inset:0;overflow:auto;display:flex;flex-direction:column;align-items:center;padding:48px 20px;
+    background:linear-gradient(180deg,#f7f8fa,#fff);}
+  .fb-home h1{font-size:30px;font-weight:600;margin:0 0 18px;letter-spacing:-.5px;}
+  .fb-home form{width:min(560px,100%);}
+  .fb-home input{width:100%;box-sizing:border-box;padding:13px 20px;font-size:15px;border:1px solid #dfe1e5;border-radius:24px;outline:none;box-shadow:0 1px 6px rgba(32,33,36,.12);}
+  .fb-home input:focus{box-shadow:0 1px 8px rgba(32,33,36,.25);}
+  .fb-quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px;width:min(560px,100%);margin-top:28px;}
+  .fb-quick button{border:none;background:#fff;border-radius:12px;padding:14px 6px;cursor:pointer;font-size:12px;color:#3c4043;box-shadow:0 1px 3px rgba(0,0,0,.08);}
+  .fb-quick button:hover{background:#f1f3f4;}
+  .fb-quick b{display:block;font-size:24px;margin-bottom:6px;font-weight:400;}
+  .fb-note{font-size:11.5px;color:#80868b;margin-top:26px;max-width:520px;text-align:center;line-height:1.5;}
+  .fb-hint{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);display:flex;align-items:center;gap:10px;max-width:calc(100% - 28px);
+    background:#202124;color:#fff;font-size:12px;padding:8px 8px 8px 14px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.3);z-index:2;}
+  .fb-hint button{border:none;border-radius:7px;padding:6px 10px;font-size:12px;cursor:pointer;flex:0 0 auto;}
+  .fb-hint .go{background:#8ab4f8;color:#202124;font-weight:600;}
+  .fb-hint .no{background:transparent;color:#bdc1c6;}
+  .fb-load{position:absolute;left:0;top:0;height:2px;background:#1a73e8;width:0;z-index:3;transition:width .4s ease;}
   .paint-wrap{display:flex;flex-direction:column;height:100%;}
   .paintbar{display:flex;gap:5px;padding:7px 8px;background:#eee;border-bottom:1px solid #ddd;align-items:center;flex-wrap:wrap;}
   .paintbar input[type=color]{width:26px;height:26px;border:none;padding:0;background:none;cursor:pointer;flex:0 0 auto;}
@@ -867,7 +904,9 @@
   function trackPointer(onMove, onEnd){
     const mm = e=>onMove(e.clientX, e.clientY);
     const tm = e=>{ const t=e.touches[0]; if(t) onMove(t.clientX, t.clientY); };
+    document.body.classList.add('fx-tracking');   // live web pages (Browser) mustn't swallow the drag
     const up = ()=>{
+      document.body.classList.remove('fx-tracking');
       window.removeEventListener('mousemove', mm); window.removeEventListener('mouseup', up);
       window.removeEventListener('touchmove', tm); window.removeEventListener('touchend', up);
       onEnd();
@@ -1386,7 +1425,7 @@
       case 'calc': return {w:250,h:360};
       case 'notes': return {w:380,h:320};
       case 'files': return {w:480,h:380};
-      case 'browser': return {w:480,h:380};
+      case 'browser': return {w:960,h:640};
       case 'paint': return {w:460,h:380};
       case 'settings': return {w:340,h:340};
       case 'trash': return {w:320,h:280};
@@ -1510,24 +1549,7 @@
       });
     }
     else if(id==='files'){ buildFilesApp(container); }
-    else if(id==='browser'){
-      container.innerHTML = `
-        <div style="display:flex;flex-direction:column;height:100%;">
-          <div class="browserbar"><input type="text" value="https://fauxos.example/home" /></div>
-          <div class="browserpage">
-            <h2 style="margin-top:0;">🌐 Welcome to FauxOS Browser</h2>
-            <p>This is a pretend browser inside your pretend desktop. There's no real internet here — just vibes.</p>
-            <p>Try typing a fake address above and pressing Enter!</p>
-          </div>
-        </div>`;
-      const input = container.querySelector('input');
-      const page = container.querySelector('.browserpage');
-      input.addEventListener('keydown', e=>{
-        if(e.key==='Enter'){
-          page.innerHTML = `<h2 style="margin-top:0;">🔍 Loading "${esc(input.value)}"...</h2><p>(Just kidding — this browser isn't connected to anything. It's all make-believe!)</p>`;
-        }
-      });
-    }
+    else if(id==='browser'){ buildBrowser(container); }
     else if(id==='paint'){ buildPaint(container); }
     else if(id==='settings'){
       container.innerHTML = `<div class="app-pad">
@@ -5667,6 +5689,204 @@
         state='idle';
       }
     });
+  }
+
+  // ---------- Browser (real web pages in frames, with tabs) ----------
+  // Pages load in sandboxed iframes. Many big sites send headers forbidding being shown inside another page;
+  // known ones get a friendly "open in a new tab" panel, and every page gets an Open-in-new-tab button.
+  // Back/forward follow this tab's own address history (a browser can't read another site's history).
+  function buildBrowser(container){
+    const HOME = 'fauxos://newtab';
+    const BLOCKED = ['facebook.com','instagram.com','twitter.com','x.com','threads.net','amazon.com','github.com','reddit.com',
+      'netflix.com','linkedin.com','tiktok.com','mail.google.com','accounts.google.com','drive.google.com','docs.google.com',
+      'chatgpt.com','claude.ai','discord.com','twitch.tv','spotify.com','apple.com','paypal.com','ebay.com','pinterest.com',
+      'stackoverflow.com','yahoo.com','bing.com','duckduckgo.com','nytimes.com','cnn.com','bbc.com','roblox.com','microsoft.com','outlook.com'];
+    const QUICK = [
+      {i:'🔎', n:'Google', u:'https://www.google.com/search?igu=1&q='},
+      {i:'📚', n:'Wikipedia', u:'https://en.wikipedia.org/wiki/Main_Page'},
+      {i:'🗺️', n:'Map', u:'https://www.openstreetmap.org/export/embed.html?bbox=-122.52%2C37.70%2C-122.35%2C37.83&layer=mapnik'},
+      {i:'🏛️', n:'Internet Archive', u:'https://archive.org/'},
+      {i:'🧮', n:'Desmos', u:'https://www.desmos.com/calculator'},
+      {i:'🎨', n:'Excalidraw', u:'https://excalidraw.com/'},
+      {i:'♟️', n:'Lichess', u:'https://lichess.org/'},
+      {i:'📰', n:'Hacker News', u:'https://news.ycombinator.com/'},
+    ];
+    container.innerHTML = `<div class="fb">
+      <div class="fb-tabs"><button class="fb-newtab" title="New tab">+</button></div>
+      <div class="fb-bar">
+        <button class="fb-btn" data-a="back" title="Back">←</button>
+        <button class="fb-btn" data-a="fwd" title="Forward">→</button>
+        <button class="fb-btn" data-a="reload" title="Reload">↻</button>
+        <button class="fb-btn" data-a="home" title="Home">⌂</button>
+        <input class="fb-url" type="text" spellcheck="false" autocomplete="off" placeholder="Search Google or type a web address">
+        <button class="fb-btn" data-a="ext" title="Open this page in a real browser tab">↗</button>
+      </div>
+      <div class="fb-body"><div class="fb-load"></div></div>
+    </div>`;
+    const tabsEl = container.querySelector('.fb-tabs'), newBtn = container.querySelector('.fb-newtab');
+    const urlIn = container.querySelector('.fb-url'), body = container.querySelector('.fb-body'), bar = container.querySelector('.fb-load');
+    const btn = a => container.querySelector(`[data-a="${a}"]`);
+    const tabs = []; let cur = null;
+
+    function hostOf(u){ try{ return new URL(u).hostname.replace(/^www\./,''); }catch(e){ return ''; } }
+    function isBlocked(u){
+      const h = hostOf(u); if(!h) return false;
+      if(h==='google.com' && /[?&]igu=1/.test(u)) return false;
+      if(h==='google.com') return true;
+      if(h==='youtube.com' || h==='m.youtube.com') return !/\/embed\//.test(u);
+      return BLOCKED.some(b => h===b || h.endsWith('.'+b));
+    }
+    // Turn whatever was typed into a loadable address: a URL, a YouTube embed, or a Google search.
+    function resolve(raw){
+      let s = (raw||'').trim(); if(!s) return HOME;
+      if(s===HOME) return HOME;
+      if(/^[a-z][a-z0-9+.-]*:/i.test(s) && !/^https?:/i.test(s)) return 'https://www.google.com/search?igu=1&q='+encodeURIComponent(s);
+      const looksUrl = /^https?:\/\//i.test(s) || (!/\s/.test(s) && (/^[^\s/]+\.[a-z]{2,}(?::\d+)?(\/.*)?$/i.test(s) || /^localhost(:\d+)?(\/.*)?$/i.test(s)));
+      if(!looksUrl) return 'https://www.google.com/search?igu=1&q='+encodeURIComponent(s);
+      if(!/^https?:\/\//i.test(s)) s = (/^localhost/i.test(s) ? 'http://' : 'https://') + s;
+      try{
+        const u = new URL(s), h = u.hostname.replace(/^www\./,'');
+        if(h==='youtu.be' && u.pathname.length>1) return 'https://www.youtube.com/embed/'+u.pathname.slice(1);
+        if((h==='youtube.com'||h==='m.youtube.com') && u.pathname==='/watch' && u.searchParams.get('v')) return 'https://www.youtube.com/embed/'+u.searchParams.get('v');
+        if((h==='youtube.com'||h==='m.youtube.com') && u.pathname.startsWith('/shorts/')) return 'https://www.youtube.com/embed/'+u.pathname.split('/')[2];
+        if(h==='google.com' && u.pathname==='/search' && !u.searchParams.has('igu')){ u.searchParams.set('igu','1'); return u.href; }
+        if(h==='google.com' && (u.pathname==='/'||u.pathname==='')) return 'https://www.google.com/search?igu=1&q=';
+        return u.href;
+      }catch(e){ return 'https://www.google.com/search?igu=1&q='+encodeURIComponent(s); }
+    }
+    function display(u){ return u===HOME ? '' : u.replace('?igu=1&q=','?q=').replace('&igu=1','').replace('?igu=1',''); }
+    function titleFor(u){
+      if(u===HOME) return 'New Tab';
+      if(/youtube\.com\/embed\//.test(u)) return 'YouTube';
+      try{ const x = new URL(u); if(/google\.com$/.test(x.hostname) && x.searchParams.get('q')) return x.searchParams.get('q')+' - Search';
+        if(/google\.com$/.test(x.hostname)) return 'Google';
+        if(/wikipedia\.org$/.test(x.hostname) && x.pathname.startsWith('/wiki/')) return decodeURIComponent(x.pathname.slice(6)).replace(/_/g,' ');
+      }catch(e){}
+      return hostOf(u) || u;
+    }
+    function homePage(t){
+      const d = document.createElement('div'); d.className = 'fb-home';
+      d.innerHTML = `<h1>🌐 FauxOS Browser</h1>
+        <form><input type="text" placeholder="Search Google or type a web address" spellcheck="false" autocomplete="off"></form>
+        <div class="fb-quick">${QUICK.map((q,i)=>`<button type="button" data-q="${i}"><b>${q.i}</b>${esc(q.n)}</button>`).join('')}</div>
+        <div class="fb-note">Pages load for real. Some sites (like YouTube's homepage, Facebook or Amazon) don't allow being shown inside another page — for those, use ↗ to open them in a real browser tab. YouTube video links play here automatically.</div>`;
+      const inp = d.querySelector('input');
+      d.querySelector('form').addEventListener('submit', e=>{ e.preventDefault(); go(t, inp.value); });
+      inp.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); go(t, inp.value); } });
+      d.querySelectorAll('[data-q]').forEach(b => b.addEventListener('click', ()=> go(t, QUICK[+b.dataset.q].u)));
+      setTimeout(()=>{ if(t===cur) inp.focus(); }, 30);
+      return d;
+    }
+    function blockedPage(u){
+      const d = document.createElement('div'); d.className = 'fb-home';
+      d.innerHTML = `<h1 style="font-size:46px;">🚧</h1>
+        <div style="font-size:17px;font-weight:600;margin-bottom:8px;">${esc(hostOf(u))} can't be shown inside FauxOS</div>
+        <div style="font-size:13px;color:#5f6368;max-width:440px;text-align:center;line-height:1.5;">This site tells browsers not to display it inside other pages, so it has to open in a real browser tab.</div>
+        <button type="button" style="margin-top:18px;border:none;background:#1a73e8;color:#fff;font-size:13.5px;padding:10px 18px;border-radius:20px;cursor:pointer;">Open ${esc(hostOf(u))} in a new tab ↗</button>`;
+      d.querySelector('button').addEventListener('click', ()=> openExternal(u));
+      return d;
+    }
+    function openExternal(u){ if(u && u!==HOME){ const w = window.open(u, '_blank', 'noopener'); if(!w) toast('Your browser blocked the new tab — allow pop-ups for this page'); } }
+
+    function render(t){
+      if(t.view){ t.view.remove(); t.view = null; }
+      if(t.hint){ t.hint.remove(); t.hint = null; }
+      const u = t.hist[t.idx];
+      if(u===HOME) t.view = homePage(t);
+      else if(isBlocked(u)) t.view = blockedPage(u);
+      else{
+        const f = document.createElement('iframe');
+        f.setAttribute('sandbox','allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-modals allow-downloads allow-presentation');
+        f.setAttribute('allow','fullscreen; autoplay; encrypted-media; picture-in-picture; clipboard-write');
+        f.setAttribute('referrerpolicy','strict-origin-when-cross-origin');
+        f.addEventListener('load', ()=>{
+          if(t===cur){ bar.style.width='100%'; setTimeout(()=>{ if(t===cur){ bar.style.transition='none'; bar.style.width='0'; void bar.offsetWidth; bar.style.transition=''; } }, 350); }
+          // Same-origin pages let us follow in-page navigation; for other sites we can't see it.
+          try{ const href = f.contentWindow.location.href; if(href && href!=='about:blank' && href!==t.hist[t.idx]){ t.hist.splice(t.idx+1); t.hist.push(href); t.idx++; } t.title = f.contentDocument.title || t.title; }catch(e){}
+          refresh();
+          if(!t.hintShown && !/youtube\.com\/embed|wikipedia\.org|google\.com\/search/.test(u)) showHint(t, u);
+        });
+        f.src = u;
+        if(t===cur){ bar.style.width='70%'; }
+        t.view = f;
+      }
+      t.title = titleFor(u);
+      t.view.style.display = t===cur ? '' : 'none';
+      body.appendChild(t.view);
+    }
+    function showHint(t, u){
+      t.hintShown = true;
+      const h = document.createElement('div'); h.className = 'fb-hint';
+      h.innerHTML = `<span>Page blank or refusing to load? Some sites block being shown here.</span><button class="go">Open in new tab ↗</button><button class="no">✕</button>`;
+      h.querySelector('.go').addEventListener('click', ()=>{ openExternal(u); h.remove(); });
+      h.querySelector('.no').addEventListener('click', ()=> h.remove());
+      h.style.display = t===cur ? '' : 'none';
+      body.appendChild(h); t.hint = h;
+      setTimeout(()=>{ if(h.isConnected) h.remove(); }, 9000);
+    }
+    function go(t, raw){
+      const u = resolve(raw);
+      t.hist.splice(t.idx+1); t.hist.push(u); t.idx = t.hist.length-1; t.hintShown = false;
+      render(t); refresh();
+    }
+    function refresh(){
+      tabsEl.querySelectorAll('.fb-tab').forEach(e=>e.remove());
+      tabs.forEach(t=>{
+        const e = document.createElement('div'); e.className = 'fb-tab'+(t===cur?' active':'');
+        e.innerHTML = `<span class="t"></span><button class="x" title="Close tab">✕</button>`;
+        e.querySelector('.t').textContent = t.title; e.title = t.title;
+        e.addEventListener('mousedown', ev=>{ if(ev.button===1){ ev.preventDefault(); closeTab(t); } });
+        e.addEventListener('click', ev=>{ if(ev.target.classList.contains('x')) closeTab(t); else select(t); });
+        tabsEl.insertBefore(e, newBtn);
+      });
+      if(!cur) return;
+      if(document.activeElement!==urlIn) urlIn.value = display(cur.hist[cur.idx]);
+      btn('back').disabled = cur.idx<=0;
+      btn('fwd').disabled = cur.idx>=cur.hist.length-1;
+      btn('ext').disabled = cur.hist[cur.idx]===HOME;
+    }
+    function select(t){
+      cur = t;
+      tabs.forEach(x=>{ if(x.view) x.view.style.display = x===t ? '' : 'none'; if(x.hint) x.hint.style.display = x===t ? '' : 'none'; });
+      bar.style.width = '0';
+      urlIn.value = display(t.hist[t.idx]);
+      refresh();
+    }
+    function newTab(u){
+      const t = {hist:[], idx:-1, title:'New Tab', view:null, hint:null, hintShown:false};
+      tabs.push(t); cur = t;
+      go(t, u||HOME); select(t);
+      if(!u || u===HOME) setTimeout(()=>{ const i = t.view && t.view.querySelector('input'); if(i) i.focus(); }, 30);
+      return t;
+    }
+    function closeTab(t){
+      const i = tabs.indexOf(t); if(i<0) return;
+      if(t.view) t.view.remove(); if(t.hint) t.hint.remove();
+      tabs.splice(i,1);
+      if(!tabs.length){ newTab(); return; }
+      if(cur===t) select(tabs[Math.min(i, tabs.length-1)]); else refresh();
+    }
+
+    newBtn.addEventListener('click', ()=> newTab());
+    btn('back').addEventListener('click', ()=>{ if(cur.idx>0){ cur.idx--; render(cur); refresh(); } });
+    btn('fwd').addEventListener('click', ()=>{ if(cur.idx<cur.hist.length-1){ cur.idx++; render(cur); refresh(); } });
+    btn('reload').addEventListener('click', ()=>{ render(cur); refresh(); });
+    btn('home').addEventListener('click', ()=> go(cur, HOME));
+    btn('ext').addEventListener('click', ()=> openExternal(cur.hist[cur.idx]));
+    urlIn.addEventListener('focus', ()=> urlIn.select());
+    urlIn.addEventListener('keydown', e=>{
+      if(e.key==='Enter'){ e.preventDefault(); go(cur, urlIn.value); urlIn.blur(); }
+      else if(e.key==='Escape'){ urlIn.value = display(cur.hist[cur.idx]); urlIn.blur(); }
+    });
+    container.addEventListener('keydown', e=>{
+      if(!(e.ctrlKey||e.metaKey)) return;
+      const k = e.key.toLowerCase();
+      if(k==='t'){ e.preventDefault(); newTab(); }
+      else if(k==='w'){ e.preventDefault(); closeTab(cur); }
+      else if(k==='l'){ e.preventDefault(); urlIn.focus(); }
+      else if(k==='r'){ e.preventDefault(); render(cur); refresh(); }
+    });
+    newTab();
   }
 
   // ---------- Paint (multi-tool drawing app) ----------
